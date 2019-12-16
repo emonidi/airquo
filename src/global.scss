@@ -72,3 +72,17 @@ button:focus {
     display: flex;
     justify-content: space-between;
 }
+
+.value{
+    color:#fff;
+    font-size: 22;
+    padding:10px;
+    margin:0;
+  }
+
+  .drawer{
+	  will-change: auto;
+	  @media(max-width: 640px){
+		  width:100% !important;
+	  }
+  }

@@ -24,37 +24,48 @@
       });
 
       map.on("load", ev => {
-        map.addSource("air", { type: "geojson", data: features });
+        map.addSource("air", {
+          type: "geojson",
+          data: features,
+          cluster: false,
+          clusterMaxZoom: 14, // Max zoom to cluster points on
+          clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+        });
+        
         map.addLayer({
-          minzoom:4,  
+          minzoom: 0,
           id: "source",
           source: "air",
           data: features,
           type: "circle",
           paint: {
+            "circle-opacity": {
+              stops: [[0, 0.01], [10, 1]]
+            },
             "circle-color": {
               property: "aqi",
               type: "interval",
               stops: [
-                [50, "#009966"],
-                [100, "#ffde33"],
-                [150, "#ff9933"],
-                [200, "#cc0033"],
-                [300, "#660099"]
+                [0, "#009966"],
+                [50, "#ffde33"],
+                [100, "#ff9933"],
+                [150, "#cc0033"],
+                [200, "#660099"],
+                [300, "#7e0023"]
               ]
             },
-            
+
             "circle-radius": 8
           }
         });
         dispatchMapChange(ev);
       });
 
-        map.on("zoomend", dispatchMapChange);
-        map.on("dragend", dispatchMapChange);
-        map.on('click','source',(ev)=>{
-            dispatch('stationClicked',{...ev.features})
-        })
+      map.on("zoomend", dispatchMapChange);
+      map.on("dragend", dispatchMapChange);
+      map.on("click", "source", ev => {
+        dispatch("stationClicked", { ...ev.features });
+      });
     }
 
     if (map && map.getSource("air")) {

@@ -4,7 +4,7 @@
   import Map from "./Map.svelte";
   import Marker from "./Marker.svelte";
   import { stationId, station } from "./LocationStore";
-  import  StationDetails from './StationDetails.svelte';
+  import StationDetails from "./StationDetails.svelte";
 
   import Drawer, {
     AppContent,
@@ -17,51 +17,54 @@
 
   import IconButton from "@smui/icon-button";
 
+  window.worker.addEventListener("message", function(e) {
+    if (e.data.action === "ON_AIR_FETCHED") {
+      data = e.data.payload;
+    }
+  });
+  let firstDataFetched = false;
   let data = [];
   let coordinates;
-  let zoom = 8;
+  let zoom = 2;
 
   const getAir = async coords => {
-    const { _sw, _ne } = coords;
-    const bounds = [_ne.lat, _ne.lng, _sw.lat, _sw.lng];
-    const res = await fetch(
-      `https://api.waqi.info/map/bounds/?token=c472110c54ce8941e8a361c36bdbd21613f9ab69&latlng=${bounds.join(
-        ","
-      )}`
-    );
-    return await res.json();
+    window.worker.postMessage({ action: "FETCH_AIR", payload: coords });
   };
 
   onMount(() => {
-    window.navigator.geolocation.getCurrentPosition(onSuccess);
+    window.navigator.geolocation.getCurrentPosition(onSuccess, err => {
+      console.log(err);
+    });
   });
 
   const onSuccess = ({ coords }) => {
     coordinates = coords;
+    //[_ne.lat, _ne.lng, _sw.lat, _sw.lng]
+    // window.worker.postMessage({ action: "FETCH_AIR", payload: {
+    //   _ne:{
+    //     lat:-90.000,
+    //     lng:-180.000
+    //   },
+    //   _sw:{
+    //     lat:90.000,
+    //     lng:180.000,
+    //   }
+    // } });
   };
 
   const handleMapChange = async ev => {
+    if(firstDataFetched) return;
     const d = await getAir(ev.detail.bounds);
-    data = [...d.data].map(item => ({
-      type: "Feature",
-      properties: {
-        aqi: parseInt(item.aqi),
-		uid: item.uid,
-		station:item.station
-      },
-      geometry: {
-        type: "Point",
-        coordinates: [item.lon, item.lat]
-      }
-    }));
+    firstDataFetched = true;
   };
 
   const handleStationClicked = ev => {
-    station.set({...ev.detail[0].properties});
+    station.set({ ...ev.detail[0].properties });
   };
+
   let selectedStation;
   const unsubscribeStation = station.subscribe(value => {
-	selectedStation = value ? {...value, station:JSON.parse(value.station)} : null;
+    selectedStation = value;
   });
 </script>
 
@@ -78,8 +81,8 @@
 </style>
 
 <AppHeader />
-<Drawer variant="modal" open={selectedStation !== null}>
-	<StationDetails></StationDetails>
+<Drawer class="drawer" variant="modal" open={selectedStation !== null}>
+  <StationDetails />
 </Drawer>
 <Scrim />
 <AppContent>
