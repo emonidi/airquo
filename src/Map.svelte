@@ -69,8 +69,7 @@
     }
 
     if (map && map.getSource("air")) {
-      console.log(features);
-      console.log(map.getSource("air").setData(features));
+      
     }
   });
 

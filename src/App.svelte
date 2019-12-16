@@ -40,21 +40,21 @@
   const onSuccess = ({ coords }) => {
     coordinates = coords;
     //[_ne.lat, _ne.lng, _sw.lat, _sw.lng]
-    // window.worker.postMessage({ action: "FETCH_AIR", payload: {
-    //   _ne:{
-    //     lat:-90.000,
-    //     lng:-180.000
-    //   },
-    //   _sw:{
-    //     lat:90.000,
-    //     lng:180.000,
-    //   }
-    // } });
+    window.worker.postMessage({ action: "FETCH_AIR", payload: {
+      _ne:{
+        lat:-89.9,
+        lng:-179.9
+      },
+      _sw:{
+        lat:89.9,
+        lng:179.9,
+      }
+    } });
   };
 
   const handleMapChange = async ev => {
     if(firstDataFetched) return;
-    const d = await getAir(ev.detail.bounds);
+    // const d = await getAir(ev.detail.bounds);
     firstDataFetched = true;
   };
 
@@ -64,7 +64,7 @@
 
   let selectedStation;
   const unsubscribeStation = station.subscribe(value => {
-    selectedStation = value;
+    selectedStation = value;  
   });
 </script>
 
