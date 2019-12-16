@@ -17,17 +17,36 @@
 
   import IconButton from "@smui/icon-button";
 
-  window.worker.addEventListener("message", function(e) {
-    if (e.data.action === "ON_AIR_FETCHED") {
-      data = e.data.payload;
-    }
-  });
+  
   let firstDataFetched = false;
   let data = [];
   let coordinates;
   let zoom = 2;
 
+  window.worker.addEventListener("message", function(e) {
+    if (e.data.action === "ON_AIR_FETCHED") {
+      debugger
+      data = [...e.data.payload];
+    }
+  });
+
+  function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
+
   const getAir = async coords => {
+    debugger
     window.worker.postMessage({ action: "FETCH_AIR", payload: coords });
   };
 
@@ -42,20 +61,21 @@
     //[_ne.lat, _ne.lng, _sw.lat, _sw.lng]
     window.worker.postMessage({ action: "FETCH_AIR", payload: {
       _ne:{
-        lat:-89.9,
-        lng:-179.9
+        lat:90,
+        lng:180
       },
       _sw:{
-        lat:89.9,
-        lng:179.9,
+        lat:-90,
+        lng:-180,
       }
     } });
+      firstDataFetched = true;
   };
 
   const handleMapChange = async ev => {
     if(firstDataFetched) return;
-    // const d = await getAir(ev.detail.bounds);
-    firstDataFetched = true;
+    const d = await getAir(ev.detail.bounds);
+    
   };
 
   const handleStationClicked = ev => {
@@ -92,7 +112,7 @@
     height="calc(100vh - 64px)"
     {zoom}
     features={{ type: 'FeatureCollection', features: [...data] }}
-    on:mapChange={handleMapChange}
+    on:mapChange={debounce((ev)=>handleMapChange(ev),750)}
     on:stationClicked={handleStationClicked} />
 </AppContent>
 <!-- <Header>

@@ -9,12 +9,14 @@
   export let zoom;
   export let features;
 
+
   let map;
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiZW1vbmlkaSIsImEiOiJjajdqd3pvOHYwaThqMzJxbjYyam1lanI4In0.V_4P8bJqzHxM2W9APpkf1w";
 
   afterUpdate(props => {
+   
     if (!map && coords) {
       map = new mapboxgl.Map({
         container: "map", // container id
@@ -69,7 +71,7 @@
     }
 
     if (map && map.getSource("air")) {
-      
+      map.getSource("air").setData(features)
     }
   });
 

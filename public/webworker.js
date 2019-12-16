@@ -3,13 +3,12 @@ self.addEventListener('message', async function(e) {
     switch(e.data.action){
         case 'FETCH_AIR':
             coords = e.data.payload;
-            const data = await fetchAir(coords);
-            const stations = await fetchStations();
+            const data = await fetchAir(e.data.payload);
             self.postMessage({action:"ON_AIR_FETCHED",payload:data});
             setInterval(async () => {
                 const data = await fetchAir(coords);
                 self.postMessage({action:"ON_AIR_FETCHED",payload:data});
-            }, 60*1000);
+            }, 60000);
             return;
         case 'FETCH_STATION_DETAILS':
             const payload = await reverseGeocode(e.data.payload.station.location)
@@ -17,6 +16,7 @@ self.addEventListener('message', async function(e) {
             return;
     }    
 })
+
 
 
 const reverseGeocode = async(stationLocation) =>{
@@ -51,28 +51,27 @@ const fetchStationDetails =  async stationId => {
 async function fetchAir(coords){
     const { _sw, _ne } = coords;
     const bounds = [_ne.lat, _ne.lng, _sw.lat, _sw.lng];
-    // const res = await fetch(
-    //   `https://api.waqi.info/map/bounds/?token=c472110c54ce8941e8a361c36bdbd21613f9ab69&latlng=${bounds.join(
-    //     ","
-    //   )}`
-    // );
-
-    const res = await fetch(`https://maps.luftdaten.info/data/v2/data.dust.min.json`)
+    const res = await fetch(
+      `https://api.waqi.info/map/bounds/?token=c472110c54ce8941e8a361c36bdbd21613f9ab69&latlng=${bounds.join(
+        ","
+      )}`
+    );
+    // const res = await fetch(`https://maps.luftdaten.info/data/v2/data.dust.min.json`)
    
-    const d  = await res.json();
-
-   const data = [...d].filter(item => !isNaN(parseInt(item.sensordatavalues[0].value))).map(item => ({
+    let d  = await res.json();
+    d = d.data;
+    const data = [...d]
+    .filter(item => !isNaN(parseInt(item.aqi)))
+    .map(item => ({
         type: "Feature",
         properties: {
-          aqi: parseInt(item.sensordatavalues[0].value),
+          aqi: parseInt(item.aqi),
           uid: item.id,
-          station:{
-            location:[parseFloat(item.location.longitude), parseFloat(item.location.latitude)]
-          }
+          station:item.station
         },
         geometry: {
           type: "Point",
-          coordinates: [parseFloat(item.location.longitude), parseFloat(item.location.latitude)]
+          coordinates: [parseFloat(item.lon), parseFloat(item.lat)]
         }
       }));
 
