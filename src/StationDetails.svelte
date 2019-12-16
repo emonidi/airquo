@@ -2,6 +2,7 @@
   import { Header, Title, Content } from "@smui/drawer";
   import IconButton from "@smui/icon-button";
   import { station } from "./LocationStore";
+  import {aqiIcon} from './iconMap'
   import List ,{Item,Text} from "@smui/list";
   import Paper, {Content as PaperContent} from "@smui/paper";
   import Card, { Content as CardContent, Title as CardTitle } from "@smui/card";
@@ -77,12 +78,17 @@
 <Content>
   <Card>
     <CardContent>
-      <div>Air quality is</div>
       <div class="paper-container">
         <Paper
           style="background-color:{selectedStation && getColorFromValue(parseInt(selectedStation.aqi))}" >
           <PaperContent align="center">
-            <h1 class="value">{selectedStation && selectedStation.aqi}</h1>
+            {#if selectedStation && selectedStation.aqi}
+              <div class="aqi-indication">
+              <img style="width:50px;height:50px" src={aqiIcon(selectedStation.aqi)}/>
+              <h1 class="value">{selectedStation && selectedStation.aqi}</h1>
+              </div>
+            {/if}
+           
           </PaperContent>
         </Paper>
       </div>

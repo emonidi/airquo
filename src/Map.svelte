@@ -20,7 +20,7 @@
     if (!map && coords) {
       map = new mapboxgl.Map({
         container: "map", // container id
-        style: "mapbox://styles/mapbox/dark-v10", //hosted style id
+        style: "mapbox://styles/mapbox/dark-v10?optimize=true", //hosted style id
         center: [coords.longitude, coords.latitude], // starting position
         zoom: zoom // starting zoom
       });

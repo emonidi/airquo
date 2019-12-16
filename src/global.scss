@@ -87,3 +87,11 @@ button:focus {
 	  }
 	  width: 33% !important;
   }
+
+@media(max-width:640px){
+	.aqi-indication{
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+	}
+}
