@@ -2,44 +2,36 @@
   import { Header, Title, Content } from "@smui/drawer";
   import IconButton from "@smui/icon-button";
   import { station } from "./LocationStore";
-  import List, { Item, Text } from "@smui/list";
-  import Paper, { Content as PaperContent } from "@smui/paper";
+  import List ,{Item,Text} from "@smui/list";
+  import Paper, {Content as PaperContent} from "@smui/paper";
   import Card, { Content as CardContent, Title as CardTitle } from "@smui/card";
   let selectedStation;
   let stationData;
-  let values = [];
+  let values = []
 
-  const getSelectedStationDetails = async station => {
-    window.worker.postMessage({
-      action: "FETCH_STATION_DETAILS",
-      payload: station
-    });
+  const getSelectedStationDetails = async stationId => {
+    window.worker.postMessage({action:'FETCH_STATION_DETAILS',payload:stationId})
   };
 
-  window.worker.addEventListener("message", ({ data }) => {
-    if (data.action === "ON_STATION_DETAILS_FETCHED") {
-      station.set({ ...data.payload });
+  window.worker.addEventListener('message',({data})=>{
+    const {action,payload} = data;
+    if(action === "ON_STATION_DETAILS_FETCHED"){
+      debugger
+      values = payload;
     }
-  });
+  })
 
   const unsubscribeStation = station.subscribe(value => {
     if (value) {
-      selectedStation = {
-        ...value,
-        station:
-          typeof value.station === "string"
-            ? JSON.parse(value.station)
-            : value.station
-      };
-      if (!selectedStation.station.name) {
-        getSelectedStationDetails(selectedStation);
-      }
+      selectedStation = { ...value, station: JSON.parse(value.station) };
+      getSelectedStationDetails(selectedStation.uid);
     } else {
       selectedStation = value;
       stationData = null;
       values = [];
     }
   });
+
 
   const getColorFromValue = value => {
     if (value < 51) {
@@ -62,26 +54,15 @@
       return "#660099";
     }
 
-    if (value >= 300) {
-      return "#7e0023";
+    if(value >= 300){
+      return "#7e0023"
     }
-    return "black";
+     return "black"
   };
 </script>
 
-<style>
-  .value {
-    color: #fff;
-    font-size: 22;
-    padding: 10px;
-    margin: 0;
-  }
-</style>
-
 <Header class="drawer-header">
-  <Title>
-    {selectedStation && selectedStation.station && selectedStation.station.name}
-  </Title>
+  <Title>{selectedStation && selectedStation.station.name}</Title>
   <IconButton
     ripple={false}
     on:click={() => {
@@ -99,19 +80,28 @@
       <div>Air quality is</div>
       <div class="paper-container">
         <Paper
-          style="background-color:{selectedStation && getColorFromValue(parseInt(selectedStation.aqi))}">
+          style="background-color:{selectedStation && getColorFromValue(parseInt(selectedStation.aqi))}" >
           <PaperContent align="center">
             <h1 class="value">{selectedStation && selectedStation.aqi}</h1>
           </PaperContent>
         </Paper>
       </div>
       <List>
-        <!-- {#each values as value}
+      {#each values as value}
         <Item>
           <Text>{`${value.key}: ${value.value}`}</Text>
         </Item>
-      {/each} -->
+      {/each}
       </List>
     </CardContent>
   </Card>
 </Content>
+
+<style>
+  .value{
+    color:#fff;
+    font-size: 22;
+    padding:10px;
+    margin:0;
+  }
+</style>

@@ -11,8 +11,8 @@ self.addEventListener('message', async function(e) {
             }, 60000);
             return;
         case 'FETCH_STATION_DETAILS':
-            const payload = await reverseGeocode(e.data.payload.station.location)
-            self.postMessage({action:"ON_STATION_DETAILS_FETCHED",payload:{...e.data.payload,station:{...e.data.payload.station,name:payload}}})
+            const payload = await fetchStationDetails(e.data.payload)
+            self.postMessage({action:"ON_STATION_DETAILS_FETCHED",payload})
             return;
     }    
 })
@@ -66,7 +66,7 @@ async function fetchAir(coords){
         type: "Feature",
         properties: {
           aqi: parseInt(item.aqi),
-          uid: item.id,
+          uid: item.uid,
           station:item.station
         },
         geometry: {
