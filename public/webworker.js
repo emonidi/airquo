@@ -1,4 +1,4 @@
-let coords
+var coords;
 self.addEventListener('message', async function(e) {
     switch(e.data.action){
         case 'FETCH_AIR':

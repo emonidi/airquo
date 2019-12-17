@@ -3,12 +3,13 @@
   import IconButton from "@smui/icon-button";
   import { onMount, onDestroy } from "svelte";
   import { station } from "./stores/LocationStore";
+  import LinearProgress from "@smui/linear-progress";
   import {
     getSelectedStationDetails,
     selectedStation
   } from "./stores/StationsStore";
   import { aqiIcon } from "./iconMap";
-  import { navigate } from "svelte-routing";
+  import { navigate, routing } from "svelte-routing";
   import List, { Item, Text } from "@smui/list";
   import Paper, { Content as PaperContent } from "@smui/paper";
   import Card, { Content as CardContent, Title as CardTitle } from "@smui/card";
@@ -16,29 +17,33 @@
 
   export let id;
   let selected;
+  let closed = false;
   let stationData;
   let values = [];
 
   onMount(() => {
     currentRoute.set("station");
     getSelectedStationDetails(id);
+    return function() {
+      currentRoute.set("home");
+      selectedStation.set(null);
+      unsubscribeStation();
+    };
   });
-  onDestroy(() => {
-    currentRoute.set(null);
-    selectedStation.set(null);
-    unsubscribeStation();
-  });
+
+ 
 
   const unsubscribeStation = selectedStation.subscribe(value => {
     if (value) {
-      console.log(value);
       selected = { ...value };
+      closed = true;
     } else {
       selected = value;
       stationData = null;
       values = [];
     }
   });
+
 
   const getColorFromValue = value => {
     if (value < 51) {
@@ -77,12 +82,16 @@
   }
 </style>
 
+<LinearProgress indeterminate {closed} />
 <Header class="drawer-header">
+
   <Title>{selected ? selected.city.name : ''}</Title>
   <IconButton
     ripple={false}
     on:click={() => {
+      debugger;
       station.set(null);
+      currentRoute.set('home');
       navigate('/');
     }}
     align="end"

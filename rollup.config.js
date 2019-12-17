@@ -41,15 +41,15 @@ export default {
 			extract: true,
 			minimize: true,
 			use: [
-			  ['sass', {
-				includePaths: [
-				  './theme',
-				  './node_modules'
-				]
-			  }]
+				['sass', {
+					includePaths: [
+						'./theme',
+						'./node_modules'
+					]
+				}]
 			]
-		  }),
-		
+		}),
+
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
@@ -63,22 +63,22 @@ export default {
 		// instead of npm run dev), minify
 		production && terser(),
 		babel({
-			extensions: [ '.js', '.mjs', '.html', '.svelte' ],
+			extensions: ['.js', '.mjs', '.html', '.svelte'],
 			runtimeHelpers: true,
-			exclude: [ 'node_modules/@babel/**', 'node_modules/core-js/**' ],
+			exclude: ['node_modules/@babel/**', 'node_modules/core-js/**'],
 			presets: [
 				[
 					'@babel/preset-env',
 					{
 						targets: '> 0.25%, not dead',
 						useBuiltIns: 'usage',
-  					corejs: 3
+						corejs: 3
 					}
 				]
 			],
 			plugins: [
-			'@babel/plugin-syntax-dynamic-import',
-			[
+				'@babel/plugin-syntax-dynamic-import',
+				[
 					'@babel/plugin-transform-runtime',
 					{
 						useESModules: false
