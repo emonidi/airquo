@@ -3,9 +3,11 @@
   import AppHeader from "./Header.svelte";
   import Map from "./Map.svelte";
   import Marker from "./Marker.svelte";
-  import { stationId, station } from "./LocationStore";
+  import { stationId, station } from "./stores/LocationStore";
   import StationDetails from "./StationDetails.svelte";
-
+  import {stations, fetchStations} from './stores/StationsStore'
+  import {currentRoute} from './stores/UIStore';
+  import {Router, Link, Route} from 'svelte-routing';
   import Drawer, {
     AppContent,
     Content,
@@ -22,13 +24,20 @@
   let data = [];
   let coordinates;
   let zoom = 2;
+  let shouldOpenDrawer = false;
 
-  window.worker.addEventListener("message", function(e) {
-    if (e.data.action === "ON_AIR_FETCHED") {
-      debugger
-      data = [...e.data.payload];
-    }
-  });
+  stations.subscribe(st => {
+    data = st;
+  })
+
+  currentRoute.subscribe(routeString => {
+     shouldOpenDrawer = false;
+     switch(routeString){
+       case "station":
+         shouldOpenDrawer = true;
+         return;
+     }
+  })
 
   function debounce(func, wait, immediate) {
 	var timeout;
@@ -46,7 +55,6 @@
 };
 
   const getAir = async coords => {
-    debugger
     window.worker.postMessage({ action: "FETCH_AIR", payload: coords });
   };
 
@@ -74,13 +82,11 @@
 
   const handleMapChange = async ev => {
     if(firstDataFetched) return;
-    const d = await getAir(ev.detail.bounds);
+    const d = await fetchStations(ev.detail.bounds);
     
   };
 
-  const handleStationClicked = ev => {
-    station.set({ ...ev.detail[0].properties });
-  };
+ 
 
   let selectedStation;
   const unsubscribeStation = station.subscribe(value => {
@@ -101,8 +107,12 @@
 </style>
 
 <AppHeader />
-<Drawer class="drawer" variant="modal" open={selectedStation !== null}>
-  <StationDetails />
+<Drawer class="drawer" variant="modal" open={shouldOpenDrawer}>
+  <Router>
+    <Route let:params path="station/:id">
+      <StationDetails id={params.id}/>
+    </Route>
+  </Router>
 </Drawer>
 <Scrim />
 <AppContent>
@@ -113,20 +123,5 @@
     {zoom}
     features={{ type: 'FeatureCollection', features: [...data] }}
     on:mapChange={debounce((ev)=>handleMapChange(ev),750)}
-    on:stationClicked={handleStationClicked} />
+    />
 </AppContent>
-<!-- <Header>
-</Header>
-<main>
-  <div id="map-container">
-  <Map
-    coords={coordinates}
-    width="100%"
-    height="100vh"
-    {zoom}
-	features={{
-	"type" : "FeatureCollection",
-	"features" : [...data]
-}}
-    on:mapChange={handleMapChange} /></div>
-</main> -->

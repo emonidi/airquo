@@ -1,5 +1,6 @@
 <script>
   import { onMount, afterUpdate, createEventDispatcher } from "svelte";
+  import { navigate } from "svelte-routing";
 
   const dispatch = createEventDispatcher();
 
@@ -9,14 +10,12 @@
   export let zoom;
   export let features;
 
-
   let map;
 
   mapboxgl.accessToken =
     "pk.eyJ1IjoiZW1vbmlkaSIsImEiOiJjajdqd3pvOHYwaThqMzJxbjYyam1lanI4In0.V_4P8bJqzHxM2W9APpkf1w";
 
   afterUpdate(props => {
-   
     if (!map && coords) {
       map = new mapboxgl.Map({
         container: "map", // container id
@@ -33,7 +32,7 @@
           clusterMaxZoom: 14, // Max zoom to cluster points on
           clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
         });
-        
+
         map.addLayer({
           minzoom: 0,
           id: "source",
@@ -66,12 +65,15 @@
       map.on("zoomend", dispatchMapChange);
       map.on("dragend", dispatchMapChange);
       map.on("click", "source", ev => {
-        dispatch("stationClicked", { ...ev.features });
+        // dispatch("stationClicked", { ...ev.features });
+        if (ev.features && ev.features[0].properties.uid) {
+          navigate(`/station/${ev.features[0].properties.uid}`);
+        }
       });
     }
 
     if (map && map.getSource("air")) {
-      map.getSource("air").setData(features)
+      map.getSource("air").setData(features);
     }
   });
 

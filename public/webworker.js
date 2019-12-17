@@ -37,12 +37,15 @@ const fetchStationDetails =  async stationId => {
       );
       stationData = await res.json();
       if(stationData.status !== 'error'){
-        return Object.keys(stationData.data.iaqi).map((k)=>{
+        return {
+          ...stationData.data, 
+          iaqi:Object.keys(stationData.data.iaqi).map((k)=>{
             return {
               key:k.toUpperCase(),
               value:parseFloat(stationData.data.iaqi[k].v).toFixed(2)
             }
-          });
+          })
+        } 
       }else{
           return [];
       }

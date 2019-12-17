@@ -18,7 +18,9 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
+    "google-maps-image-api": "^1.0.3",
     "sirv-cli": "^0.4.4",
-    "svelte-material-ui": "^1.0.0-beta.18"
+    "svelte-material-ui": "^1.0.0-beta.18",
+    "svelte-routing": "^1.4.0"
   }
 }
