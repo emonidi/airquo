@@ -7,7 +7,6 @@
   let currRoute;
 
   const subscribeCurrentRoute = currentRoute.subscribe(cr => {
-    debugger;
     currRoute = cr;
   });
 
@@ -20,7 +19,6 @@
         <IconButton class="material-icons menu-button">menu</IconButton>
       {:else}
         <IconButton on:click={()=>{
-          debugger;
           currentRoute.set('home')
           navigate('/')
         }} class="material-icons menu-button">arrow_back</IconButton>

@@ -12,16 +12,18 @@ window.addEventListener('load',()=>{
             stations.set([...e.data.payload]);
         }
       });
+
+      window.worker.addEventListener("message", ({ data }) => {
+        const { action, payload } = data;
+        console.log(data)
+        if (action === "ON_STATION_DETAILS_FETCHED") {
+            selectedStation.set(payload)
+        }
+      });
 })
 
 export const getSelectedStationDetails = async stationId => {
-    window.worker.addEventListener("message", ({ data }) => {
-    const { action, payload } = data;
-    console.log(data)
-    if (action === "ON_STATION_DETAILS_FETCHED") {
-        selectedStation.set(payload)
-    }
-  });
+    
     window.worker.postMessage({
       action: "FETCH_STATION_DETAILS",
       payload: stationId

@@ -110,7 +110,8 @@
 <Drawer class="drawer" variant="modal" open={shouldOpenDrawer}>
   <Router>
     <Route let:params path="station/:id">
-      <StationDetails id={params.id}/>
+     
+      <StationDetails {...params}/>
     </Route>
   </Router>
 </Drawer>

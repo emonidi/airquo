@@ -1,7 +1,7 @@
 <script>
   import { Header, Title, Content } from "@smui/drawer";
   import IconButton from "@smui/icon-button";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, onDestroy, afterUpdate } from "svelte";
   import { station } from "./stores/LocationStore";
   import LinearProgress from "@smui/linear-progress";
   import {
@@ -21,7 +21,7 @@
   let stationData;
   let values = [];
 
-  onMount(() => {
+  onMount(async() => {
     currentRoute.set("station");
     getSelectedStationDetails(id);
     return function() {
@@ -31,7 +31,13 @@
     };
   });
 
- 
+  afterUpdate((change)=>{
+    if(selected && parseInt(id) !== selected.idx){
+      closed = false;
+      selectedStation.set(null);
+      getSelectedStationDetails(id);
+    }
+  })
 
   const unsubscribeStation = selectedStation.subscribe(value => {
     if (value) {
@@ -89,7 +95,6 @@
   <IconButton
     ripple={false}
     on:click={() => {
-      debugger;
       station.set(null);
       currentRoute.set('home');
       navigate('/');
