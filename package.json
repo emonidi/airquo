@@ -7,6 +7,11 @@
     "start": "sirv public"
   },
   "devDependencies": {
+    "@babel/core": "^7.7.2",
+    "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+    "@babel/plugin-transform-runtime": "^7.6.2",
+    "@babel/preset-env": "^7.7.1",
+    "@babel/runtime": "^7.7.2",
     "rollup": "^1.12.0",
     "rollup-plugin-commonjs": "^10.0.0",
     "rollup-plugin-livereload": "^1.0.0",
@@ -18,7 +23,8 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
-    "google-maps-image-api": "^1.0.3",
+    "babel-polyfill": "^6.26.0",
+    "rollup-plugin-babel": "^4.3.3",
     "sirv-cli": "^0.4.4",
     "svelte-material-ui": "^1.0.0-beta.18",
     "svelte-routing": "^1.4.0"

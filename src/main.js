@@ -1,3 +1,5 @@
+import "babel-polyfill";
+
 import App from './App.svelte';
 
 import "./global.scss";

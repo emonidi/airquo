@@ -4,6 +4,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import postcss from 'rollup-plugin-postcss'
+import babel from 'rollup-plugin-babel';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -60,7 +61,31 @@ export default {
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser()
+		production && terser(),
+		babel({
+			extensions: [ '.js', '.mjs', '.html', '.svelte' ],
+			runtimeHelpers: true,
+			exclude: [ 'node_modules/@babel/**', 'node_modules/core-js/**' ],
+			presets: [
+				[
+					'@babel/preset-env',
+					{
+						targets: '> 0.25%, not dead',
+						useBuiltIns: 'usage',
+  					corejs: 3
+					}
+				]
+			],
+			plugins: [
+			'@babel/plugin-syntax-dynamic-import',
+			[
+					'@babel/plugin-transform-runtime',
+					{
+						useESModules: false
+					}
+				]
+			]
+		}),
 	],
 	watch: {
 		clearScreen: false
