@@ -4,6 +4,7 @@
   import { onMount, onDestroy, afterUpdate } from "svelte";
   import { station } from "./stores/LocationStore";
   import LinearProgress from "@smui/linear-progress";
+  
   import {
     getSelectedStationDetails,
     selectedStation
@@ -20,18 +21,30 @@
   let closed = false;
   let stationData;
   let values = [];
+  let backListener;
+  
+  const onPopState  = () => {
+      navigate('/')
+      currentRoute.set("home");
+      selectedStation.set(null);
+      unsubscribeStation();
+      window.removeEventListener('popstate',onPopState);
+  }
 
   onMount(async() => {
     currentRoute.set("station");
     getSelectedStationDetails(id);
+    window.addEventListener('popstate',onPopState)
     return function() {
       currentRoute.set("home");
       selectedStation.set(null);
       unsubscribeStation();
+      window.removeEventListener('popstate',onPopState);
     };
   });
 
   afterUpdate((change)=>{
+    console.log(id)
     if(selected && parseInt(id) !== selected.idx){
       closed = false;
       selectedStation.set(null);
