@@ -5,9 +5,13 @@ self.addEventListener('message', async function(e) {
             coords = e.data.payload;
             const data = await fetchAir(e.data.payload);
             self.postMessage({action:"ON_AIR_FETCHED",payload:data});
+            const separated = separateByAqiRange(data);
+            self.postMessage({action:"SORTED_STATIONS",payload:separated});
             setInterval(async () => {
                 const data = await fetchAir(coords);
                 self.postMessage({action:"ON_AIR_FETCHED",payload:data});
+                const separated = separateByAqiRange(data);
+                self.postMessage({action:"SORTED_STATIONS",payload:separated});
             }, 60000);
             return;
         case 'FETCH_STATION_DETAILS':
@@ -17,7 +21,60 @@ self.addEventListener('message', async function(e) {
     }    
 })
 
+const separateByAqiRange = (values)=>{
+  let intervals = [
+    [], // 0 - 50
+    [], // 51 - 100
+    [], // 101 - 150
+    [], // 151 - 200
+    [], // 200 - 300
+    [], // 300+
+  ]
 
+  const cols =  ["#009966","#ffde33","#ff9933","#cc0033", "#660099","#7e0023"];
+
+  values.forEach((item,i)=>{
+    const aqi = item.properties.aqi;
+    if(i === 0){
+      
+    }
+    if(aqi >= 0 && aqi <= 50 ){
+      intervals[0].push(item);
+    }
+
+    if(aqi >= 51 && aqi <= 100 ){
+      intervals[1].push(item);
+    }
+
+    if(aqi >= 101 && aqi <= 150 ){
+      intervals[2].push(item);
+    }
+    
+    if(aqi >= 151 && aqi <= 200 ){
+      intervals[3].push(item);
+    }
+
+    if(aqi >= 200 && aqi <= 300 ){
+      intervals[4].push(item);
+    }
+
+    if(aqi > 300 ){
+      intervals[5].push(item);
+    }
+  
+  })
+
+ intervals = intervals.map((int,i)=>{
+    return {
+      type: 'FeatureCollection',
+      features:int,
+      color:cols[i]
+    }
+  })
+
+  return intervals;
+    
+}
 
 const reverseGeocode = async(stationLocation) =>{
   const [lng,lat] = stationLocation;

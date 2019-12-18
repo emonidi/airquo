@@ -1,7 +1,7 @@
 <script>
   import { onMount, afterUpdate, createEventDispatcher } from "svelte";
   import { navigate } from "svelte-routing";
-
+  import { sortedStations } from "./stores/StationsStore";
   const dispatch = createEventDispatcher();
 
   export let coords;
@@ -9,7 +9,7 @@
   export let height;
   export let zoom;
   export let features;
-
+  let unsubscribeFromSeparated;
   let map;
 
   mapboxgl.accessToken =
@@ -34,7 +34,7 @@
         });
 
         map.addLayer({
-          minzoom: 0,
+          minzoom: 7,
           id: "source",
           source: "air",
           data: features,
@@ -74,6 +74,59 @@
 
     if (map && map.getSource("air")) {
       map.getSource("air").setData(features);
+    }
+    if (map && !unsubscribeFromSeparated) {
+      unsubscribeFromSeparated = sortedStations.subscribe(ld => {
+        ld.forEach((el, i) => {
+          if (map) {
+            map.addSource(`heat-map-${i}`, {
+              type: "geojson",
+              data: el
+            });
+
+            map.addLayer(
+              {
+                id: `aqi-heat-${i}`,
+                type: "heatmap",
+                source: `heat-map-${i}`,
+                maxzoom: 7,
+                paint: {
+                  // increase weight as diameter breast height increases
+                  "heatmap-weight": {
+                    property: "aqi",
+                    type: "exponential",
+                    stops: [[1, 0], [62, 1]]
+                  },
+                  // increase intensity as zoom level increases
+                  "heatmap-intensity": {
+                    stops: [[0, 0], [10, 5]]
+                  },
+                  // assign color values be applied to points depending on their density
+                  "heatmap-color": [
+                    "interpolate",
+                    ["linear"],
+                    ["heatmap-density"],
+                    0,
+                    "transparent",
+                    1,
+                    el.color
+                  ],
+                  // increase radius as zoom increases
+                  "heatmap-radius": {
+                    stops: [[11, 15], [15, 20]]
+                  },
+                  // decrease opacity to transition into the circle layer
+                  "heatmap-opacity": {
+                    default: 1,
+                    stops: [[14, 1], [15, 0]]
+                  }
+                }
+              },
+              "waterway-label"
+            );
+          }
+        });
+      });
     }
   });
 
