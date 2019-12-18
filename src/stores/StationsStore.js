@@ -2,23 +2,25 @@ import {writable} from 'svelte/store';
 
 export const stations = writable([]);
 export const selectedStation = writable(null);
+export const sortedStations = writable([])
 export const fetchStations = (coords) =>{
     window.worker.postMessage({ action: "FETCH_AIR", payload: coords });
 }
 
 window.addEventListener('load',()=>{
-    window.worker.addEventListener("message", function(e) {
-        if (e.data.action === "ON_AIR_FETCHED") {
-            stations.set([...e.data.payload]);
-        }
-      });
-
-      window.worker.addEventListener("message", ({ data }) => {
+    window.worker.addEventListener("message", function({data}) {
         const { action, payload } = data;
-        console.log(data)
-        if (action === "ON_STATION_DETAILS_FETCHED") {
-            selectedStation.set(payload)
+        switch(action){
+            case "ON_AIR_FETCHED":
+                stations.set(payload);
+                return;
+            case "ON_STATION_DETAILS_FETCHED":
+                selectedStation.set(payload)
+                return;
+            case "SORTED_STATIONS":
+                sortedStations.set(payload)
         }
+        
       });
 })
 
