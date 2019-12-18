@@ -113,12 +113,12 @@
                   ],
                   // increase radius as zoom increases
                   "heatmap-radius": {
-                    stops: [[0, 10], [15, 85]]
+                    stops: [[0, 10], [15, 75]]
                   },
                   // decrease opacity to transition into the circle layer
                   "heatmap-opacity": {
                     default: 1,
-                    stops: [[0, 0.5], [15, 1]]
+                    stops: [[0, 0.1], [15, 1]]
                   }
                 }
               },
