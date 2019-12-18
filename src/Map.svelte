@@ -78,7 +78,7 @@
     if (map && !unsubscribeFromSeparated) {
       unsubscribeFromSeparated = sortedStations.subscribe(ld => {
         ld.forEach((el, i) => {
-          if (map) {
+          if (!map.getSource(`heat-map-${i}`)) {
             map.addSource(`heat-map-${i}`, {
               type: "geojson",
               data: el
@@ -124,6 +124,8 @@
               },
               "waterway-label"
             );
+          }else{
+            map.getSource(`heat-map-${i}`).setData(el)
           }
         });
       });
