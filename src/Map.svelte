@@ -19,7 +19,7 @@
     if (!map && coords) {
       map = new mapboxgl.Map({
         container: "map", // container id
-        style: "mapbox://styles/mapbox/dark-v10?optimize=true", //hosted style id
+        style: "mapbox://styles/mapbox/dark-v10", //hosted style id
         center: [coords.longitude, coords.latitude], // starting position
         zoom: zoom // starting zoom
       });
@@ -41,7 +41,7 @@
           type: "circle",
           paint: {
             "circle-opacity": {
-              stops: [[0, 0.01], [10, 1]]
+              stops: [[0, 0.01], [10, 0.8]]
             },
             "circle-color": {
               property: "aqi",
@@ -58,7 +58,7 @@
 
             "circle-radius": 8
           }
-        });
+        },'waterway-label');
         dispatchMapChange(ev);
       });
 
@@ -84,48 +84,60 @@
               data: el
             });
 
-            map.addLayer(
-              {
-                id: `aqi-heat-${i}`,
-                type: "heatmap",
-                source: `heat-map-${i}`,
-                maxzoom: 7,
-                paint: {
-                  // increase weight as diameter breast height increases
-                  "heatmap-weight": {
-                    property: "aqi",
-                    type: "exponential",
-                    stops: [[1, 0], [62, 1]]
-                  },
-                  // increase intensity as zoom level increases
-                  "heatmap-intensity": {
-                    stops: [[0, 0], [10, 5]]
-                  },
-                  // assign color values be applied to points depending on their density
-                  "heatmap-color": [
-                    "interpolate",
-                    ["linear"],
-                    ["heatmap-density"],
-                    0,
-                    "transparent",
-                    1,
-                    el.color
-                  ],
-                  // increase radius as zoom increases
-                  "heatmap-radius": {
-                    stops: [[0, 10], [15, 75]]
-                  },
-                  // decrease opacity to transition into the circle layer
-                  "heatmap-opacity": {
-                    default: 1,
-                    stops: [[0, 0.1], [15, 1]]
-                  }
-                }
-              },
-              "waterway-label"
-            );
-          }else{
-            map.getSource(`heat-map-${i}`).setData(el)
+            map.addLayer({
+              id: `aqi-heat-${i}`,
+              type: "heatmap",
+              source: `heat-map-${i}`,
+              maxzoom: 7,
+              paint: {
+                // increase weight as diameter breast height increases
+                "heatmap-intensity": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  0,
+                  1,
+                  9,
+                  3
+                ],
+                // increase intensity as zoom level increases
+                "heatmap-intensity": {
+                  stops: [[0, 0], [20, 7]]
+                },
+                // assign color values be applied to points depending on their density
+                "heatmap-color": [
+                  "interpolate",
+                  ["linear"],
+                  ["heatmap-density"],
+                  0,
+                  "transparent",
+                  1,
+                  el.color
+                ],
+                // increase radius as zoom increases
+                "heatmap-radius": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  0,
+                  2,
+                  9,
+                  20
+                ],
+                // decrease opacity to transition into the circle layer
+                "heatmap-opacity": [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  7,
+                  .5,
+                  9,
+                  0
+                ]
+              }
+            },'waterway-label');
+          } else {
+            map.getSource(`heat-map-${i}`).setData(el);
           }
         });
       });
