@@ -44,8 +44,7 @@
   });
 
   afterUpdate((change)=>{
-    console.log(id)
-    if(selected && parseInt(id) !== selected.idx){
+    if(selected && id !== selected.uid){
       closed = false;
       selectedStation.set(null);
       getSelectedStationDetails(id);
@@ -104,7 +103,7 @@
 <LinearProgress indeterminate {closed} />
 <Header class="drawer-header">
 
-  <Title>{selected ? selected.city.name : ''}</Title>
+  <Title>{selected ? selected.station.name : ''}</Title>
   <IconButton
     ripple={false}
     on:click={() => {

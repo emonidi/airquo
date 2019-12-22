@@ -89,23 +89,25 @@ const fetchStations = async() => {
 }
 
 const fetchStationDetails =  async stationId => {
-    const res = await fetch(
-        `https://api.waqi.info/feed/@${stationId}/?token=c472110c54ce8941e8a361c36bdbd21613f9ab69`
-      );
+    // const res = await fetch(
+    //     `https://api.waqi.info/feed/@${stationId}/?token=c472110c54ce8941e8a361c36bdbd21613f9ab69`
+    //   );
+    const res = await fetch(`http://localhost:3000/station/${stationId}`)
       stationData = await res.json();
-      if(stationData.status !== 'error'){
-        return {
-          ...stationData.data, 
-          iaqi:Object.keys(stationData.data.iaqi).map((k)=>{
-            return {
-              key:k.toUpperCase(),
-              value:parseFloat(stationData.data.iaqi[k].v).toFixed(2)
-            }
-          })
-        } 
-      }else{
-          return [];
-      }
+      return {...stationData, iaqi:[]}
+      // if(stationData.status !== 'error'){
+      //   return {
+      //     ...stationData.data, 
+      //     iaqi:Object.keys(stationData.data.iaqi).map((k)=>{
+      //       return {
+      //         key:k.toUpperCase(),
+      //         value:parseFloat(stationData.data.iaqi[k].v).toFixed(2)
+      //       }
+      //     })
+      //   } 
+      // }else{
+      //     return [];
+      // }
 }
 
 async function fetchAir(coords){
@@ -117,7 +119,9 @@ async function fetchAir(coords){
     //   )}`
     // );
     // const res = await fetch(`https://maps.luftdaten.info/data/v2/data.dust.min.json`)
-    const res = await fetch('https://evening-caverns-26602.herokuapp.com/')
+    // const res = await fetch('https://evening-caverns-26602.herokuapp.com/')
+    const res = await fetch('http://localhost:3000')
+
     let d  = await res.json();
     d = d.data;
     const data = [...d]
