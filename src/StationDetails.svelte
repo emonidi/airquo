@@ -44,7 +44,7 @@
   });
 
   afterUpdate((change)=>{
-    if(selected && id !== selected.uid){
+    if(selected && id !== selected.uuid){
       closed = false;
       selectedStation.set(null);
       getSelectedStationDetails(id);

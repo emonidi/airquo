@@ -25,7 +25,6 @@ window.addEventListener('load',()=>{
 })
 
 export const getSelectedStationDetails = async stationId => {
-    
     window.worker.postMessage({
       action: "FETCH_STATION_DETAILS",
       payload: stationId
