@@ -10,10 +10,11 @@
     selectedStation
   } from "./stores/StationsStore";
   import { aqiIcon } from "./iconMap";
-  import { navigate, routing } from "svelte-routing";
+  import { navigate } from "svelte-routing";
   import List, { Item, Text } from "@smui/list";
   import Paper, { Content as PaperContent } from "@smui/paper";
-  import Card, { Content as CardContent, Title as CardTitle } from "@smui/card";
+  import Card, { Content as CardContent } from "@smui/card";
+  // import {CardTitle} from "@smui/card"
   import { currentRoute } from "./stores/UIStore";
 
   export let id;
@@ -103,7 +104,7 @@
 <LinearProgress indeterminate {closed} />
 <Header class="drawer-header">
 
-  <Title>{selected ? selected.station.name : ''}</Title>
+  <h1>{selected ? selected.station.name : ''}</h1>
   <IconButton
     ripple={false}
     on:click={() => {
